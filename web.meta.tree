@@ -50,6 +50,8 @@
 	pack icon git \https://github.com/nin-jin/mol_icon.git
 \/mol/view
 	include \/mol/view/tree/test
+\/bog/ui
+	namespace \bog\ui
 \/giper
 	pack balls git \https://github.com/giper-dev/balls.git
 	pack baza git \https://github.com/giper-dev/baza.git
@@ -152,6 +154,12 @@
 	deploy \/giper/baza/diagram/crus-jepsen.png
 	deploy \/giper/baza/docker/deploy.sh
 	deploy \/giper/baza/docker/autopull_and_restart.sh
+\/giper/bot
+	deploy \/giper/bot/logo
+	include \/mol/offline/install
+\/bog/blitz
+	include \/mol/offline/install
+	deploy \/bog/blitz/assets
 \/bog/page/app
 	include \/mol/offline/install
 	deploy \/bog/page/assets
