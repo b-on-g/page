@@ -1,0 +1,10 @@
+$bog_page_textarea $mol_textarea
+	paste?event null
+	Edit $bog_page_textarea_edit
+		paste?event <=> paste?event
+
+$bog_page_textarea_edit $mol_textarea_edit
+	paste?event null
+	event *
+		^
+		paste?event <=> paste?event

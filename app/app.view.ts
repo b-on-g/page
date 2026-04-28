@@ -7,7 +7,6 @@ namespace $.$$ {
 			return $bog_page_store.make({ $: this.$ })
 		}
 
-		@$mol_mem
 		registry() {
 			return this.store().registry()
 		}
@@ -17,22 +16,26 @@ namespace $.$$ {
 			return this.$.$mol_state_arg.value('page', next) ?? ''
 		}
 
-		@$mol_mem
 		page_links() {
 			return this.registry().Pages()?.remote_list() ?? []
 		}
 
 		@$mol_mem
-		screen_body() {
-			if (this.current_page_link()) return [this.Editor(this.current_page_link())]
-			const list = this.page_links()
-			if (!list.length) return [this.Empty_hint(), this.Pages_list()]
-			return [this.Pages_list()]
+		ensure_default_page() {
+			if (this.current_page_link()) return null
+			if (this.page_links().length) {
+				const first = this.page_links()[0] as $bog_page_entry
+				this.current_page_link(first.land().link().str)
+				return null
+			}
+			this.create()
+			return null
 		}
 
-		@$mol_mem
-		page_rows() {
-			return this.page_links().map((_, i) => this.Page_card(String(i)))
+		sidebar_items() {
+			const items: $mol_view[] = [this.Create_item(), this.Radio()]
+			this.page_links().forEach((_, i) => items.push(this.Page_item(String(i))))
+			return items
 		}
 
 		page_entry(key: string) {
@@ -43,18 +46,17 @@ namespace $.$$ {
 			return this.page_entry(key)?.Title()?.val() ?? 'Untitled'
 		}
 
+		page_active(key: string) {
+			const e = this.page_entry(key)
+			if (!e) return false
+			return e.land().link().str === this.current_page_link()
+		}
+
 		@$mol_action
 		open_page(key: string) {
 			const entry = this.page_entry(key)
 			if (!entry) return
 			this.current_page_link(entry.land().link().str)
-		}
-
-		@$mol_action
-		delete_page(key: string) {
-			const entry = this.page_entry(key)
-			if (!entry) return
-			this.registry().Pages('auto')!.cut(entry.link())
 		}
 
 		@$mol_action

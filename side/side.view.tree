@@ -5,15 +5,18 @@ $bog_page_side $mol_page
 	body_text? \
 	body_html \
 	body_view null
-	auto /
-		<= paste_listener null
 	body /
 		<= body_view
-	Edit_view $mol_textarea
+	Edit_view $bog_page_textarea
 		hint @ \Write in MarkedText / Markdown…
 		value? <=> body_text?
-	Render $mol_text
-		text <= body_text \
+		paste?event <=> paste_image?event null
+	View_wrap $mol_view
+		event *
+			click?event <=> start_edit?event null
+		sub /
+			<= Render $mol_text
+				text <= body_text \
 	tools /
 		<= Title_field $mol_string
 			value? <=> title?
