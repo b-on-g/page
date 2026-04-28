@@ -18,7 +18,7 @@ $bog_page_app $mol_view
 		Icon <= Create_icon $mol_icon_plus
 		label @ \+ New page
 		click? <=> create? null
-	Radio $bog_blitz_radio
+	- Radio $bog_blitz_radio
 	Page_item* $bog_ui_sidebar_item
 		Icon <= Page_icon* $mol_icon_text
 		label <= page_title* \
