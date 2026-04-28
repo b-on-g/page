@@ -1,0 +1,17 @@
+$bog_page_card $mol_list
+	page_title \
+	open? null
+	delete? null
+	rows /
+		<= Row $mol_view
+			sub /
+				<= Open $mol_button_minor
+					click? <=> open? null
+					sub /
+						<= Title_label $mol_paragraph
+							title <= page_title
+				<= Delete $mol_button_minor
+					click? <=> delete? null
+					hint @ \Delete page
+					sub /
+						<= Delete_icon $mol_icon_close

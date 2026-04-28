@@ -1,0 +1,49 @@
+$bog_page_side $mol_page
+	page_link \
+	editing? false
+	title? \
+	body_text? \
+	body_html \
+	body_view null
+	auto /
+		<= paste_listener null
+	body /
+		<= body_view
+	Edit_view $mol_textarea
+		hint @ \Write in MarkedText / Markdown…
+		value? <=> body_text?
+	Render $mol_text
+		text <= body_text \
+	tools /
+		<= Title_field $mol_string
+			value? <=> title?
+			hint @ \Title
+		<= Edit_toggle $mol_check_icon
+			hint @ \Toggle Edit
+			checked? <=> editing? false
+			Icon <= Edit_icon $mol_icon_pencil_outline
+		<= Export $mol_pick
+			hint @ \Export
+			trigger_content /
+				<= Export_icon $mol_icon_export
+			bubble_content /
+				<= Copy_md $mol_button_copy
+					title @ \Copy as Markdown
+					text <= body_text
+				<= Copy_html $mol_button_copy
+					title @ \Copy as HTML
+					html <= body_html
+				<= Download $mol_button_download
+					title @ \Download .mt
+					file_name <= download_name \page.mt
+					blob <= download_blob $mol_blob
+		<= Back $mol_button_minor
+			click? <=> back? null
+			hint @ \Back to list
+			sub /
+				<= Back_icon $mol_icon_arrow_left
+	head /
+		<= Title_field
+		<= Edit_toggle
+		<= Export
+		<= Back
