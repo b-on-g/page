@@ -19,6 +19,7 @@ namespace $.$$ {
 			return e.Title()?.val() ?? ''
 		}
 
+		@$mol_mem
 		body_text(next?: string) {
 			const e = this.entry()
 			if (!e) return ''
@@ -26,7 +27,8 @@ namespace $.$$ {
 				e.Body('auto')?.val(next)
 				return next
 			}
-			return e.Body()?.val() ?? ''
+			const raw = e.Body()?.val() ?? ''
+			return raw.replace(/\n?""[^"\n]*?\\(?!https?:\/\/)[^"\n]*?""\n?/g, '')
 		}
 
 		body_html() {
@@ -65,23 +67,61 @@ namespace $.$$ {
 			const file = item.getAsFile()
 			if (!file) return null
 			e.preventDefault()
-			this.save_image(file)
+			const name = `pasted-${Date.now()}.jpg`
+			$mol_wire_async(this).save_image(file, name)
 			return null
 		}
 
-		@$mol_action
-		save_image(file: File) {
+		compress_image(file: File): Promise<Blob> {
+			const max = 1920
+			const quality = 0.85
+			return new Promise((done, fail) => {
+				const img = new $mol_dom_context.Image()
+				const blobUrl = URL.createObjectURL(file)
+				img.onload = () => {
+					try {
+						const ratio = Math.min(1, max / Math.max(img.width, img.height))
+						const w = Math.round(img.width * ratio)
+						const h = Math.round(img.height * ratio)
+						const canvas = $mol_dom_context.document.createElement('canvas')
+						canvas.width = w
+						canvas.height = h
+						const ctx = canvas.getContext('2d')!
+						ctx.drawImage(img, 0, 0, w, h)
+						canvas.toBlob(
+							blob => {
+								URL.revokeObjectURL(blobUrl)
+								blob ? done(blob) : fail(new Error('toBlob null'))
+							},
+							'image/jpeg',
+							quality,
+						)
+					} catch (err) {
+						URL.revokeObjectURL(blobUrl)
+						fail(err)
+					}
+				}
+				img.onerror = () => {
+					URL.revokeObjectURL(blobUrl)
+					fail(new Error('image load failed'))
+				}
+				img.src = blobUrl
+			})
+		}
+
+		save_image(file: File, name: string) {
 			const entry = this.entry()
 			if (!entry) return
 			const images = entry.Images('auto')!
 			const store = images.make([[null, $giper_baza_rank_post('just')]]) as $giper_baza_file
-			const ext = (file.type.split('/')[1] || 'png').replace(/[^\w]/g, '')
-			const name = `pasted-${Date.now()}.${ext}`
-			const renamed = new $mol_dom_context.File([file], name, { type: file.type })
-			store.blob(renamed)
-			const uri = store.uri()
+			if (store.chunks().length > 0) return
+			const uri = `https://baza.giper.dev/?BAZA:file=${store.link()};name=${name}`
 			const snippet = `\n""${name}\\${uri}""\n`
-			this.insert_at_cursor(snippet)
+			if (!this.body_text().includes(snippet)) {
+				this.insert_at_cursor(snippet)
+			}
+			const blob = $mol_wire_sync(this).compress_image(file)
+			store.blob(blob)
 		}
 
 		body_view() {
