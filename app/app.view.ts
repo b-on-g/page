@@ -33,7 +33,7 @@ namespace $.$$ {
 		}
 
 		sidebar_items() {
-			const items: $mol_view[] = [this.Create_item(), this.Radio()]
+			const items: $mol_view[] = [this.Create_item()]
 			this.page_links().forEach((_, i) => items.push(this.Page_item(String(i))))
 			return items
 		}
