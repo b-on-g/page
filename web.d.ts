@@ -1893,12 +1893,61 @@ declare namespace $ {
 //# sourceMappingURL=textarea.view.tree.d.ts.map
 declare namespace $ {
 
-	type $bog_page_textarea_edit__paste_bog_page_textarea_1 = $mol_type_enforce<
+	type $bog_page_textarea_edit__value_bog_page_textarea_1 = $mol_type_enforce<
+		ReturnType< $bog_page_textarea['value'] >
+		,
+		ReturnType< $bog_page_textarea_edit['value'] >
+	>
+	type $bog_page_textarea_edit__hint_bog_page_textarea_2 = $mol_type_enforce<
+		ReturnType< $bog_page_textarea['hint'] >
+		,
+		ReturnType< $bog_page_textarea_edit['hint'] >
+	>
+	type $bog_page_textarea_edit__enabled_bog_page_textarea_3 = $mol_type_enforce<
+		ReturnType< $bog_page_textarea['enabled'] >
+		,
+		ReturnType< $bog_page_textarea_edit['enabled'] >
+	>
+	type $bog_page_textarea_edit__spellcheck_bog_page_textarea_4 = $mol_type_enforce<
+		ReturnType< $bog_page_textarea['spellcheck'] >
+		,
+		ReturnType< $bog_page_textarea_edit['spellcheck'] >
+	>
+	type $bog_page_textarea_edit__length_max_bog_page_textarea_5 = $mol_type_enforce<
+		ReturnType< $bog_page_textarea['length_max'] >
+		,
+		ReturnType< $bog_page_textarea_edit['length_max'] >
+	>
+	type $bog_page_textarea_edit__selection_bog_page_textarea_6 = $mol_type_enforce<
+		ReturnType< $bog_page_textarea['selection'] >
+		,
+		ReturnType< $bog_page_textarea_edit['selection'] >
+	>
+	type $bog_page_textarea_edit__submit_bog_page_textarea_7 = $mol_type_enforce<
+		ReturnType< $bog_page_textarea['submit'] >
+		,
+		ReturnType< $bog_page_textarea_edit['submit'] >
+	>
+	type $bog_page_textarea_edit__submit_with_ctrl_bog_page_textarea_8 = $mol_type_enforce<
+		ReturnType< $bog_page_textarea['submit_with_ctrl'] >
+		,
+		ReturnType< $bog_page_textarea_edit['submit_with_ctrl'] >
+	>
+	type $bog_page_textarea_edit__paste_bog_page_textarea_9 = $mol_type_enforce<
 		ReturnType< $bog_page_textarea['paste'] >
 		,
 		ReturnType< $bog_page_textarea_edit['paste'] >
 	>
 	export class $bog_page_textarea extends $mol_textarea {
+		value( next?: string ): string
+		hint( ): string
+		enabled( ): boolean
+		spellcheck( ): boolean
+		length_max( ): number
+		selection( next?: readonly(number)[] ): readonly(number)[]
+		bring( ): ReturnType< ReturnType< $bog_page_textarea['Edit'] >['bring'] >
+		submit( next?: any ): any
+		submit_with_ctrl( ): boolean
 		paste( next?: any ): any
 		Edit( ): $bog_page_textarea_edit
 	}

@@ -10841,16 +10841,57 @@ var $;
 
 ;
 	($.$bog_page_textarea) = class $bog_page_textarea extends ($.$mol_textarea) {
+		value(next){
+			if(next !== undefined) return next;
+			return "";
+		}
+		hint(){
+			return "";
+		}
+		enabled(){
+			return true;
+		}
+		spellcheck(){
+			return true;
+		}
+		length_max(){
+			return +Infinity;
+		}
+		selection(next){
+			if(next !== undefined) return next;
+			return [];
+		}
+		bring(){
+			return (this.Edit().bring());
+		}
+		submit(next){
+			if(next !== undefined) return next;
+			return null;
+		}
+		submit_with_ctrl(){
+			return true;
+		}
 		paste(next){
 			if(next !== undefined) return next;
 			return null;
 		}
 		Edit(){
 			const obj = new this.$.$bog_page_textarea_edit();
+			(obj.value) = (next) => ((this.value(next)));
+			(obj.hint) = () => ((this.hint()));
+			(obj.enabled) = () => ((this.enabled()));
+			(obj.spellcheck) = () => ((this.spellcheck()));
+			(obj.length_max) = () => ((this.length_max()));
+			(obj.selection) = (next) => ((this.selection(next)));
+			(obj.submit) = (next) => ((this.submit(next)));
+			(obj.submit_with_ctrl) = () => ((this.submit_with_ctrl()));
 			(obj.paste) = (next) => ((this.paste(next)));
 			return obj;
 		}
 	};
+	($mol_mem(($.$bog_page_textarea.prototype), "value"));
+	($mol_mem(($.$bog_page_textarea.prototype), "selection"));
+	($mol_mem(($.$bog_page_textarea.prototype), "submit"));
 	($mol_mem(($.$bog_page_textarea.prototype), "paste"));
 	($mol_mem(($.$bog_page_textarea.prototype), "Edit"));
 	($.$bog_page_textarea_edit) = class $bog_page_textarea_edit extends ($.$mol_textarea_edit) {
@@ -10867,6 +10908,27 @@ var $;
 
 ;
 "use strict";
+
+;
+"use strict";
+var $;
+(function ($) {
+    $mol_style_attach("bog/page/textarea/textarea.view.css", `[bog_page_textarea] [mol_textarea_edit] {
+	color: var(--mol_theme_text) !important;
+	caret-color: var(--mol_theme_text);
+}
+
+[bog_page_textarea] [mol_text_code] {
+	display: none;
+}
+
+[bog_page_textarea] [mol_textarea_edit] {
+	position: relative;
+	height: auto;
+	min-height: 100%;
+}
+`);
+})($ || ($ = {}));
 
 ;
 	($.$mol_text_list) = class $mol_text_list extends ($.$mol_text) {
@@ -29337,7 +29399,8 @@ var $;
                     e.Body('auto')?.val(next);
                     return next;
                 }
-                return e.Body()?.val() ?? '';
+                const raw = e.Body()?.val() ?? '';
+                return raw.replace(/\n?""[^"\n]*?\\(?!https?:\/\/)[^"\n]*?""\n?/g, '');
             }
             body_html() {
                 return this.$.$hyoo_marked_to_html(this.body_text());
@@ -29373,22 +29436,58 @@ var $;
                 if (!file)
                     return null;
                 e.preventDefault();
-                this.save_image(file);
+                const name = `pasted-${Date.now()}.jpg`;
+                $mol_wire_async(this).save_image(file, name);
                 return null;
             }
-            save_image(file) {
+            compress_image(file) {
+                const max = 1920;
+                const quality = 0.85;
+                return new Promise((done, fail) => {
+                    const img = new $mol_dom_context.Image();
+                    const blobUrl = URL.createObjectURL(file);
+                    img.onload = () => {
+                        try {
+                            const ratio = Math.min(1, max / Math.max(img.width, img.height));
+                            const w = Math.round(img.width * ratio);
+                            const h = Math.round(img.height * ratio);
+                            const canvas = $mol_dom_context.document.createElement('canvas');
+                            canvas.width = w;
+                            canvas.height = h;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, w, h);
+                            canvas.toBlob(blob => {
+                                URL.revokeObjectURL(blobUrl);
+                                blob ? done(blob) : fail(new Error('toBlob null'));
+                            }, 'image/jpeg', quality);
+                        }
+                        catch (err) {
+                            URL.revokeObjectURL(blobUrl);
+                            fail(err);
+                        }
+                    };
+                    img.onerror = () => {
+                        URL.revokeObjectURL(blobUrl);
+                        fail(new Error('image load failed'));
+                    };
+                    img.src = blobUrl;
+                });
+            }
+            save_image(file, name) {
                 const entry = this.entry();
                 if (!entry)
                     return;
                 const images = entry.Images('auto');
                 const store = images.make([[null, $giper_baza_rank_post('just')]]);
-                const ext = (file.type.split('/')[1] || 'png').replace(/[^\w]/g, '');
-                const name = `pasted-${Date.now()}.${ext}`;
-                const renamed = new $mol_dom_context.File([file], name, { type: file.type });
-                store.blob(renamed);
-                const uri = store.uri();
+                if (store.chunks().length > 0)
+                    return;
+                const uri = `https://baza.giper.dev/?BAZA:file=${store.link()};name=${name}`;
                 const snippet = `\n""${name}\\${uri}""\n`;
-                this.insert_at_cursor(snippet);
+                if (!this.body_text().includes(snippet)) {
+                    this.insert_at_cursor(snippet);
+                }
+                const blob = $mol_wire_sync(this).compress_image(file);
+                store.blob(blob);
             }
             body_view() {
                 return this.editing() ? this.Edit_view() : this.View_wrap();
@@ -29399,8 +29498,8 @@ var $;
             }
         }
         __decorate([
-            $mol_action
-        ], $bog_page_side.prototype, "save_image", null);
+            $mol_mem
+        ], $bog_page_side.prototype, "body_text", null);
         __decorate([
             $mol_action
         ], $bog_page_side.prototype, "start_edit", null);
