@@ -20564,7 +20564,7 @@ var $;
                 const store = images.make([[null, $giper_baza_rank_post('just')]]);
                 if (store.chunks().length > 0)
                     return;
-                const uri = `https://baza.giper.dev/?BAZA:file=${store.link()};name=${name}`;
+                const uri = `?BAZA:file=${store.link()};name=${name}`;
                 const snippet = `\n""${name}\\${uri}""\n`;
                 if (!this.body_text().includes(snippet)) {
                     this.insert_at_cursor(snippet);
