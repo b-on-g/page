@@ -20491,8 +20491,7 @@ var $;
                     e.Body('auto')?.val(next);
                     return next;
                 }
-                const raw = e.Body()?.val() ?? '';
-                return raw.replace(/\n?""[^"\n]*?\\(?!https?:\/\/)[^"\n]*?""\n?/g, '');
+                return e.Body()?.val() ?? '';
             }
             body_html() {
                 return this.$.$hyoo_marked_to_html(this.body_text());
